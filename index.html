@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>VibeCoded Tech – Frontend. Design. Deployed.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Bricolage+Grotesque:opsz,wght@12..96,400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:       #0a0a14;
+  --ink2:      #0f0f1e;
+  --surface:   #141428;
+  --surface2:  #1a1a30;
+  --line:      rgba(255,255,255,0.07);
+  --line2:     rgba(255,255,255,0.12);
+  --iris:      #6c47ff;
+  --iris-lt:   #8b6fff;
+  --sky:       #00c8f0;
+  --rose:      #f0528a;
+  --sage:      #2dd4a0;
+  --chalk:     #f4f4ff;
+  --silver:    #b8b8d4;
+  --dim:       #6868a0;
+  --g-main:    linear-gradient(135deg,#6c47ff 0%,#00c8f0 100%);
+  --g-warm:    linear-gradient(135deg,#f0528a 0%,#8b6fff 100%);
+  --g-cool:    linear-gradient(135deg,#00c8f0 0%,#6c47ff 100%);
+  --fd: 'Bricolage Grotesque','Segoe UI',sans-serif;
+  --fb: 'Plus Jakarta Sans','Segoe UI',sans-serif;
+  --r:  6px;
+  --r2: 12px;
+  --r3: 20px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:16px}
+body{background:var(--ink);color:var(--chalk);font-family:var(--fb);overflow-x:hidden;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--iris);border-radius:4px}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+/* AMBIENT GLOW */
+.orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;filter:blur(120px)}
+.orb-a{width:700px;height:700px;background:rgba(108,71,255,.1);top:-300px;left:-200px;animation:drift 16s ease-in-out infinite}
+.orb-b{width:500px;height:500px;background:rgba(0,200,240,.07);bottom:-200px;right:-100px;animation:drift 14s ease-in-out infinite;animation-delay:-6s}
+.orb-c{width:400px;height:400px;background:rgba(240,82,138,.07);top:40%;left:60%;animation:drift 18s ease-in-out infinite;animation-delay:-10s}
+@keyframes drift{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-50px) scale(1.05)}}
+
+/* NAV */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 max(24px,4vw);height:64px;
+  background:rgba(10,10,20,0);
+  backdrop-filter:blur(0px);
+  border-bottom:1px solid transparent;
+  transition:background .4s ease,backdrop-filter .4s ease,border-color .4s ease;
+}
+nav.scrolled{
+  background:rgba(10,10,20,.92);
+  backdrop-filter:blur(32px) saturate(180%);
+  border-color:var(--line);
+}
+.nav-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.nav-logo-mark{
+  width:34px;height:34px;border-radius:9px;
+  background:var(--g-main);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--fd);font-weight:800;font-size:.9rem;color:#fff;
+  box-shadow:0 0 24px rgba(108,71,255,.45);
+}
+.nav-logo-text{
+  font-family:var(--fd);font-weight:800;font-size:1.1rem;letter-spacing:-.4px;
+  background:var(--g-main);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.nav-center{display:flex;gap:0;list-style:none}
+.nav-center a{
+  padding:6px 14px;border-radius:var(--r);
+  font-size:.82rem;font-weight:500;color:var(--dim);
+  transition:color .2s;letter-spacing:.01em;
+}
+.nav-center a:hover{color:var(--chalk)}
+.nav-right{display:flex;align-items:center;gap:10px}
+.nav-btn{
+  padding:8px 20px;background:transparent;color:var(--chalk);
+  border:1px solid var(--line2);border-radius:var(--r);
+  font-weight:600;font-size:.82rem;cursor:pointer;font-family:var(--fb);
+  transition:all .2s;letter-spacing:.01em;
+}
+.nav-btn:hover{background:var(--g-main);border-color:transparent;box-shadow:0 0 24px rgba(108,71,255,.4)}
+.hamburger{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:6px}
+.hamburger span{display:block;width:20px;height:1.5px;background:var(--silver);border-radius:2px;transition:.3s}
+
+/* HERO */
+.hero{
+  position:relative;z-index:1;
+  min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:120px max(24px,5vw) 80px;
+  overflow:hidden;
+}
+.hero::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size:60px 60px;
+  mask-image:radial-gradient(ellipse 70% 70% at 50% 40%, black 0%, transparent 80%);
+}
+
+.hero-badge{
+  position:relative;z-index:1;
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid rgba(108,71,255,.3);
+  background:rgba(108,71,255,.08);
+  padding:5px 16px 5px 6px;border-radius:50px;
+  font-size:.72rem;font-weight:700;color:var(--iris-lt);letter-spacing:.1em;text-transform:uppercase;
+  margin-bottom:32px;animation:fadeUp .8s ease both;
+}
+.hero-badge-dot{
+  display:flex;align-items:center;justify-content:center;
+  width:20px;height:20px;border-radius:50%;
+  background:rgba(108,71,255,.2);border:1px solid rgba(108,71,255,.4);
+}
+.hero-badge-dot::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--iris-lt);animation:pulse 2s ease infinite;display:block}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.85)}}
+
+.hero-h1{
+  position:relative;z-index:1;
+  font-family:var(--fd);font-size:clamp(3rem,7vw,7rem);
+  font-weight:800;line-height:.95;letter-spacing:-4px;margin-bottom:28px;
+  animation:fadeUp .8s ease .1s both;
+}
+.hero-h1 .line-accent{
+  display:block;
+  background:var(--g-main);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  padding-bottom:.08em;
+}
+.hero-sub{
+  position:relative;z-index:1;
+  max-width:500px;font-size:1rem;color:var(--silver);line-height:1.8;
+  margin-bottom:44px;font-weight:400;animation:fadeUp .8s ease .2s both;
+}
+.hero-btns{
+  position:relative;z-index:1;
+  display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
+  animation:fadeUp .8s ease .3s both;
+}
+.btn-primary{
+  padding:13px 28px;background:var(--g-main);color:#fff;border:none;border-radius:var(--r);
+  font-weight:700;font-size:.9rem;cursor:pointer;font-family:var(--fb);
+  box-shadow:0 4px 28px rgba(108,71,255,.4),inset 0 1px 0 rgba(255,255,255,.15);
+  transition:transform .2s,box-shadow .2s;letter-spacing:.01em;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 40px rgba(108,71,255,.55)}
+.btn-secondary{
+  padding:13px 28px;background:rgba(255,255,255,.04);color:var(--silver);
+  border:1px solid var(--line2);border-radius:var(--r);
+  font-weight:500;font-size:.9rem;cursor:pointer;font-family:var(--fb);
+  transition:all .2s;letter-spacing:.01em;
+}
+.btn-secondary:hover{background:rgba(255,255,255,.08);color:var(--chalk);border-color:var(--iris-lt)}
+
+.hero-stats{
+  position:relative;z-index:1;
+  display:flex;margin-top:72px;
+  background:rgba(20,20,40,.6);
+  border:1px solid var(--line);border-radius:var(--r2);
+  overflow:hidden;animation:fadeUp .8s ease .4s both;
+  backdrop-filter:blur(12px);
+}
+.hero-stat{padding:22px 44px;text-align:center;border-right:1px solid var(--line)}
+.hero-stat:last-child{border-right:none}
+.hero-stat-n{
+  font-family:var(--fd);font-size:1.8rem;font-weight:800;
+  background:var(--g-main);-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  line-height:1;
+}
+.hero-stat-l{font-size:.68rem;color:var(--dim);font-weight:600;margin-top:5px;letter-spacing:.08em;text-transform:uppercase}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* TICKER */
+.ticker{
+  overflow:hidden;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  background:var(--ink2);padding:13px 0;position:relative;z-index:1;
+}
+.ticker-track{display:flex;width:max-content;animation:tick 35s linear infinite}
+.ticker-item{
+  display:flex;align-items:center;gap:8px;padding:0 24px;
+  font-size:.75rem;font-weight:600;color:var(--dim);white-space:nowrap;letter-spacing:.05em;text-transform:uppercase;
+  border-right:1px solid var(--line);
+}
+.ticker-dot{width:3px;height:3px;border-radius:50%;background:var(--iris-lt);flex-shrink:0}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* SECTION BASE */
+.sec{position:relative;z-index:1;padding:100px max(24px,5vw)}
+.sec-alt{background:rgba(15,15,30,.5)}
+.sec-head{text-align:center;margin-bottom:64px}
+.sec-eye{
+  display:inline-block;font-size:.68rem;font-weight:700;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--iris-lt);margin-bottom:14px;
+}
+.sec-title{
+  font-family:var(--fd);font-size:clamp(2rem,3.8vw,3.2rem);
+  font-weight:800;letter-spacing:-1.5px;line-height:1.1;
+}
+.sec-title .hi{background:var(--g-main);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sec-desc{color:var(--dim);max-width:440px;margin:16px auto 0;line-height:1.75;font-size:.93rem}
+.rule{height:1px;background:linear-gradient(90deg,transparent,var(--line2),transparent)}
+
+/* SERVICES */
+.svc-wrap{padding:80px max(24px,5vw);position:relative;z-index:1}
+.svc-block{margin-bottom:80px}
+.svc-block-hd{
+  display:flex;align-items:center;gap:16px;margin-bottom:32px;
+  padding-bottom:24px;border-bottom:1px solid var(--line);
+}
+.svc-icon{
+  width:46px;height:46px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;
+}
+.si-a{background:rgba(108,71,255,.12);border:1px solid rgba(108,71,255,.2)}
+.si-b{background:rgba(0,200,240,.1);border:1px solid rgba(0,200,240,.18)}
+.si-c{background:rgba(240,82,138,.1);border:1px solid rgba(240,82,138,.18)}
+.si-d{background:rgba(139,111,255,.1);border:1px solid rgba(139,111,255,.18)}
+.svc-block-title{font-family:var(--fd);font-size:1.35rem;font-weight:800;letter-spacing:-.5px}
+.svc-block-sub{font-size:.8rem;color:var(--dim);margin-top:3px;line-height:1.5}
+.svc-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(210px,1fr));
+  gap:10px;
+}
+.sb{
+  position:relative;overflow:hidden;
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r2);
+  padding:20px 18px;text-align:left;cursor:pointer;
+  font-family:var(--fb);transition:transform .2s,border-color .2s,box-shadow .2s;
+}
+.sb:hover{transform:translateY(-2px)}
+.sb-a:hover{box-shadow:0 6px 24px rgba(108,71,255,.18);border-color:rgba(108,71,255,.3)}
+.sb-b:hover{box-shadow:0 6px 24px rgba(0,200,240,.15);border-color:rgba(0,200,240,.28)}
+.sb-c:hover{box-shadow:0 6px 24px rgba(240,82,138,.15);border-color:rgba(240,82,138,.28)}
+.sb-d:hover{box-shadow:0 6px 24px rgba(139,111,255,.18);border-color:rgba(139,111,255,.3)}
+.sb-icon{
+  width:32px;height:32px;border-radius:8px;margin-bottom:12px;
+  display:flex;align-items:center;justify-content:center;font-size:1rem;position:relative;z-index:1;
+}
+.sb-a .sb-icon{background:rgba(108,71,255,.1)}
+.sb-b .sb-icon{background:rgba(0,200,240,.1)}
+.sb-c .sb-icon{background:rgba(240,82,138,.1)}
+.sb-d .sb-icon{background:rgba(139,111,255,.1)}
+.sb-name{font-size:.85rem;font-weight:700;color:var(--chalk);display:block;margin-bottom:5px;line-height:1.3;position:relative;z-index:1}
+.sb-desc{font-size:.74rem;color:var(--dim);line-height:1.55;position:relative;z-index:1}
+.sb-arr{
+  position:absolute;top:14px;right:14px;
+  width:22px;height:22px;border-radius:6px;border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.65rem;color:var(--dim);transition:all .2s;z-index:1;
+}
+.sb:hover .sb-arr{color:var(--iris-lt);border-color:rgba(108,71,255,.3);background:rgba(108,71,255,.08)}
+.ai-badge{
+  display:inline-flex;align-items:center;gap:8px;margin-top:20px;
+  background:rgba(0,200,240,.06);border:1px solid rgba(0,200,240,.15);
+  padding:7px 16px;border-radius:50px;
+  font-size:.72rem;font-weight:700;color:var(--sky);letter-spacing:.04em;
+}
+.ai-badge-dot{width:5px;height:5px;border-radius:50%;background:var(--sky);animation:pulse 2.5s ease infinite;flex-shrink:0}
+
+/* WHY US */
+.why-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.why-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r2);
+  padding:32px 28px;transition:transform .25s,border-color .25s;position:relative;overflow:hidden;
+}
+.why-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:var(--g-main);opacity:0;transition:opacity .25s;
+}
+.why-card:hover{transform:translateY(-3px);border-color:var(--line2)}
+.why-card:hover::after{opacity:1}
+.why-icon{
+  width:40px;height:40px;border-radius:10px;margin-bottom:16px;
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem;
+  background:rgba(108,71,255,.1);border:1px solid rgba(108,71,255,.15);
+}
+.why-card h3{font-size:.95rem;font-weight:700;margin-bottom:8px;letter-spacing:-.2px;color:var(--chalk)}
+.why-card p{font-size:.8rem;color:var(--dim);line-height:1.7}
+
+/* PROJECTS */
+.proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:960px;margin:0 auto}
+.proj-card{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r3);
+  overflow:hidden;transition:transform .28s,box-shadow .28s,border-color .28s;display:flex;flex-direction:column;
+}
+.proj-card:hover{transform:translateY(-4px);box-shadow:0 20px 48px rgba(0,0,0,.5);border-color:var(--line2)}
+.proj-screen{height:200px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.proj-screen iframe{width:200%;height:200%;border:none;transform:scale(.5);transform-origin:top left;pointer-events:none;position:absolute;top:0;left:0}
+.proj-screen-bg{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+.proj-screen-emoji{font-size:2.8rem;filter:drop-shadow(0 4px 16px rgba(0,0,0,.6))}
+.proj-screen-label{font-size:.65rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.3)}
+.proj-hover-overlay{
+  position:absolute;inset:0;z-index:3;
+  background:rgba(10,10,20,.7);backdrop-filter:blur(4px);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .25s;
+}
+.proj-card:hover .proj-hover-overlay{opacity:1}
+.proj-hover-btn{
+  background:var(--g-main);color:#fff;padding:10px 22px;border-radius:var(--r);
+  font-size:.8rem;font-weight:700;font-family:var(--fb);
+  box-shadow:0 4px 16px rgba(108,71,255,.4);
+}
+.proj-body{padding:22px 22px 24px;flex:1;display:flex;flex-direction:column;gap:6px}
+.proj-cat{font-size:.67rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--sky)}
+.proj-name{font-family:var(--fd);font-size:1.15rem;font-weight:800;letter-spacing:-.4px}
+.proj-desc{font-size:.8rem;color:var(--dim);line-height:1.65;margin-top:2px}
+.proj-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.pt{font-size:.67rem;font-weight:600;padding:3px 10px;border-radius:50px}
+.pt-p{background:rgba(108,71,255,.1);border:1px solid rgba(108,71,255,.18);color:var(--iris-lt)}
+.pt-c{background:rgba(0,200,240,.08);border:1px solid rgba(0,200,240,.18);color:var(--sky)}
+.pt-k{background:rgba(240,82,138,.08);border:1px solid rgba(240,82,138,.18);color:var(--rose)}
+.proj-link-row{
+  display:flex;align-items:center;gap:5px;margin-top:12px;
+  font-size:.78rem;font-weight:700;color:var(--iris-lt);
+  transition:gap .2s,opacity .2s;opacity:.7;
+}
+.proj-card:hover .proj-link-row{gap:9px;opacity:1}
+
+/* FOUNDER */
+.founder-wrap{max-width:640px;margin:0 auto}
+.founder-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r3);overflow:hidden}
+.founder-top{
+  padding:48px 48px 36px;text-align:center;border-bottom:1px solid var(--line);position:relative;
+}
+.founder-top::before{
+  content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(108,71,255,.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.founder-avatar{
+  width:84px;height:84px;border-radius:50%;margin:0 auto 20px;
+  background:var(--g-main);display:flex;align-items:center;justify-content:center;
+  font-size:2rem;position:relative;
+  box-shadow:0 0 0 4px rgba(108,71,255,.15),0 0 40px rgba(108,71,255,.25);
+}
+.founder-name{font-family:var(--fd);font-size:1.6rem;font-weight:800;letter-spacing:-.6px;margin-bottom:4px}
+.founder-role{font-size:.7rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--sky);margin-bottom:16px}
+.founder-bio{color:var(--silver);line-height:1.8;font-size:.88rem;max-width:420px;margin:0 auto;position:relative}
+.founder-bottom{padding:28px 48px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.ftag{
+  background:rgba(108,71,255,.08);border:1px solid rgba(108,71,255,.16);
+  color:var(--silver);font-size:.72rem;font-weight:600;
+  padding:5px 14px;border-radius:50px;letter-spacing:.02em;
+}
+
+/* CONTACT */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:820px;margin:0 auto}
+.cc{
+  background:var(--surface);border:1px solid var(--line);border-radius:var(--r2);
+  padding:28px 24px;display:flex;flex-direction:column;gap:8px;
+  transition:transform .2s,border-color .2s;
+}
+.cc:hover{transform:translateY(-2px);border-color:var(--line2)}
+.cc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;margin-bottom:4px;flex-shrink:0}
+.cc-i-phone{background:rgba(0,200,240,.08);border:1px solid rgba(0,200,240,.15)}
+.cc-i-email{background:rgba(240,82,138,.08);border:1px solid rgba(240,82,138,.15)}
+.cc-label{font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.cc-value{font-size:.9rem;font-weight:600;color:var(--chalk);word-break:break-all}
+.cc-sub{font-size:.74rem;color:var(--dim);line-height:1.5}
+.cc-insta{grid-column:1/-1;flex-direction:row;align-items:center;gap:18px}
+.cc-insta-icon{
+  width:50px;height:50px;border-radius:12px;flex-shrink:0;
+  background:rgba(240,82,138,.08);border:1px solid rgba(240,82,138,.15);
+  display:flex;align-items:center;justify-content:center;font-size:1.3rem;
+}
+.cc-insta-r{display:flex;flex-direction:column;gap:3px}
+
+/* CONTACT DETAILS BOX */
+.cdb{max-width:820px;margin:16px auto 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r3);overflow:hidden}
+.cdb-bar{height:2px;background:linear-gradient(90deg,#6c47ff,#00c8f0,#f0528a,#8b6fff)}
+.cdb-head{padding:24px 30px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px}
+.cdb-head-ico{
+  width:40px;height:40px;border-radius:10px;
+  background:rgba(108,71,255,.1);border:1px solid rgba(108,71,255,.18);
+  display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;
+}
+.cdb-head-t h3{font-family:var(--fd);font-size:1rem;font-weight:800;letter-spacing:-.2px}
+.cdb-head-t p{font-size:.76rem;color:var(--dim);margin-top:2px}
+.cdb-items{padding:18px 30px 22px;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cdbi{
+  display:flex;align-items:flex-start;gap:12px;
+  background:rgba(255,255,255,.02);border:1px solid var(--line);
+  border-radius:var(--r2);padding:15px 16px;transition:border-color .2s,background .2s;
+}
+.cdbi:hover{border-color:var(--line2);background:rgba(108,71,255,.04)}
+.cdbi-ico{width:34px;height:34px;border-radius:9px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.9rem}
+.ci-ph{background:rgba(0,200,240,.08);border:1px solid rgba(0,200,240,.15)}
+.ci-em{background:rgba(240,82,138,.08);border:1px solid rgba(240,82,138,.15)}
+.ci-ig{background:rgba(139,111,255,.08);border:1px solid rgba(139,111,255,.15)}
+.ci-hr{background:rgba(108,71,255,.08);border:1px solid rgba(108,71,255,.15)}
+.cdbi-l{font-size:.63rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-bottom:3px}
+.cdbi-v{font-size:.84rem;font-weight:600;color:var(--chalk);word-break:break-all}
+.cdbi-s{font-size:.72rem;color:var(--dim);margin-top:2px}
+.cdbi a{color:var(--chalk);transition:color .2s}
+.cdbi a:hover{color:var(--iris-lt)}
+.cdb-acts{padding:14px 30px 22px;display:flex;gap:10px;flex-wrap:wrap}
+.cdb-act{
+  flex:1;min-width:150px;padding:11px 16px;border-radius:var(--r);
+  font-weight:600;font-size:.8rem;cursor:pointer;font-family:var(--fb);
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  transition:all .2s;text-decoration:none;letter-spacing:.01em;
+}
+.act-p{background:var(--g-main);color:#fff;border:none;box-shadow:0 4px 16px rgba(108,71,255,.3)}
+.act-p:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(108,71,255,.45)}
+.act-s{background:transparent;color:var(--silver);border:1px solid var(--line)}
+.act-s:hover{border-color:var(--iris-lt);color:var(--iris-lt)}
+
+/* FOOTER */
+footer{
+  position:relative;z-index:1;
+  padding:28px max(24px,4vw);
+  border-top:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;
+  background:rgba(10,10,20,.6);
+}
+.ft-logo{font-family:var(--fd);font-size:.95rem;font-weight:800;background:var(--g-main);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ft-copy{font-size:.74rem;color:var(--dim)}
+.ft-links{display:flex;gap:1.2rem}
+.ft-links a{font-size:.76rem;color:var(--dim);transition:color .2s}
+.ft-links a:hover{color:var(--iris-lt)}
+
+/* MODAL */
+.modal-overlay{
+  position:fixed;inset:0;z-index:300;
+  background:rgba(10,10,20,.9);backdrop-filter:blur(16px);
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-overlay.open{display:flex;animation:mfade .2s ease}
+@keyframes mfade{from{opacity:0}to{opacity:1}}
+.modal{
+  background:var(--surface2);border:1px solid var(--line2);border-radius:var(--r3);
+  padding:0;max-width:420px;width:100%;position:relative;overflow:hidden;
+  animation:mup .28s ease;
+}
+@keyframes mup{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-accent{height:1px;background:linear-gradient(90deg,transparent,var(--iris),transparent)}
+.modal-top{padding:28px 28px 22px;border-bottom:1px solid var(--line)}
+.modal-close{
+  position:absolute;top:14px;right:14px;
+  background:rgba(255,255,255,.04);border:1px solid var(--line);color:var(--dim);
+  width:28px;height:28px;border-radius:7px;font-size:.75rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;transition:all .2s;
+}
+.modal-close:hover{background:rgba(255,255,255,.1);color:var(--chalk)}
+.modal-em{font-size:1.8rem;margin-bottom:12px}
+.modal-title{font-family:var(--fd);font-size:1.15rem;font-weight:800;margin-bottom:8px;letter-spacing:-.3px}
+.modal-desc{color:var(--dim);line-height:1.7;font-size:.82rem}
+.modal-bot{padding:18px 28px 26px;display:flex;flex-direction:column;gap:9px}
+.modal-cta{
+  width:100%;padding:12px;background:var(--g-main);color:#fff;border:none;
+  border-radius:var(--r);font-weight:700;font-size:.88rem;cursor:pointer;
+  font-family:var(--fb);transition:opacity .2s;
+  box-shadow:0 4px 18px rgba(108,71,255,.3);letter-spacing:.01em;
+}
+.modal-cta:hover{opacity:.88}
+.modal-wa{
+  width:100%;padding:10px;background:rgba(45,212,160,.06);color:var(--sage);
+  border:1px solid rgba(45,212,160,.2);border-radius:var(--r);
+  font-weight:600;font-size:.82rem;cursor:pointer;font-family:var(--fb);
+  text-decoration:none;display:block;text-align:center;transition:background .2s;
+}
+.modal-wa:hover{background:rgba(45,212,160,.12)}
+
+/* REVEAL */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.rv.on{opacity:1;transform:translateY(0)}
+.rv2{opacity:0;transform:translateY(18px);transition:opacity .6s ease .1s,transform .6s ease .1s}
+.rv2.on{opacity:1;transform:translateY(0)}
+
+/* MOBILE NAV */
+#mobileNav{
+  position:fixed;top:64px;left:0;right:0;z-index:190;
+  background:rgba(10,10,20,.97);border-bottom:1px solid var(--line);
+  padding:18px max(24px,4vw) 20px;
+  backdrop-filter:blur(32px);
+}
+#mobileNav ul{list-style:none;display:flex;flex-direction:column;gap:2px}
+#mobileNav a{
+  display:block;padding:11px 12px;border-radius:var(--r);
+  font-weight:500;font-size:.9rem;color:var(--silver);
+  transition:background .2s,color .2s;
+}
+#mobileNav a:hover{background:rgba(255,255,255,.05);color:var(--chalk)}
+#mobileNav .mob-cta{
+  margin-top:10px;width:100%;padding:12px;background:var(--g-main);border:none;
+  color:#fff;border-radius:var(--r);font-family:var(--fb);font-weight:700;
+  font-size:.88rem;cursor:pointer;
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .nav-center{display:none}
+  .hamburger{display:flex}
+  nav .nav-btn{display:none}
+  .hero-h1{letter-spacing:-2.5px}
+}
+@media(max-width:680px){
+  .hero-stats{flex-direction:column}
+  .hero-stat{border-right:none;border-bottom:1px solid var(--line);padding:16px 24px}
+  .hero-stat:last-child{border-bottom:none}
+  .proj-grid{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr}
+  .cc-insta{grid-column:1}
+  .cdb-items{grid-template-columns:1fr}
+  .founder-top,.founder-bottom{padding-left:24px;padding-right:24px}
+  .cdb-head,.cdb-items,.cdb-acts{padding-left:20px;padding-right:20px}
+  footer{flex-direction:column;text-align:center}
+  .ft-links{justify-content:center}
+}
+@media(max-width:480px){
+  .svc-grid{grid-template-columns:1fr}
+  .why-grid{grid-template-columns:1fr}
+  .hero-stat{padding:14px 20px}
+}
+@media(prefers-reduced-motion:reduce){
+  .orb,.ticker-track{animation:none}
+  .rv,.rv2{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<div class="orb orb-a"></div>
+<div class="orb orb-b"></div>
+<div class="orb orb-c"></div>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="nav-logo">
+    <div class="nav-logo-mark">V</div>
+    <div class="nav-logo-text">VibeCoded Tech</div>
+  </div>
+  <ul class="nav-center">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#why">Why Us</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#founder">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="nav-btn" onclick="smoothTo('contact')">Get Started</button>
+    <div class="hamburger" onclick="toggleNav()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</nav>
+
+<!-- MOBILE NAV -->
+<div id="mobileNav" style="display:none">
+  <ul>
+    <li><a href="#services" onclick="toggleNav()">Services</a></li>
+    <li><a href="#why" onclick="toggleNav()">Why Us</a></li>
+    <li><a href="#projects" onclick="toggleNav()">Projects</a></li>
+    <li><a href="#founder" onclick="toggleNav()">About</a></li>
+    <li><a href="#contact" onclick="toggleNav()">Contact</a></li>
+  </ul>
+  <button class="mob-cta" onclick="smoothTo('contact');toggleNav()">Get Started &rarr;</button>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">
+    <span class="hero-badge-dot"></span>
+    India's Creative Tech Studio
+  </div>
+  <h1 class="hero-h1">
+    We Build.<br>
+    <span class="line-accent">We Design.</span>
+    We Deploy.
+  </h1>
+  <p class="hero-sub">VibeCoded Tech delivers pixel-perfect websites, strategic brand identities, and seamless deployment &mdash; all under one roof.</p>
+  <div class="hero-btns">
+    <button class="btn-primary" onclick="smoothTo('services')">Explore Services</button>
+    <button class="btn-secondary" onclick="smoothTo('contact')">Get a Free Quote</button>
+  </div>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="hero-stat-n">4</div><div class="hero-stat-l">Service Categories</div></div>
+    <div class="hero-stat"><div class="hero-stat-n">30+</div><div class="hero-stat-l">Services Offered</div></div>
+    <div class="hero-stat"><div class="hero-stat-n">AI</div><div class="hero-stat-l">Powered Options</div></div>
+    <div class="hero-stat"><div class="hero-stat-n">&infin;</div><div class="hero-stat-l">Creative Potential</div></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track" id="tickerTrack"></div>
+</div>
+
+<!-- PROJECTS -->
+<section class="sec" id="projects">
+  <div class="sec-head rv">
+    <div class="sec-eye">Our Work</div>
+    <h2 class="sec-title">Projects <span class="hi">Built &amp; Live</span></h2>
+    <p class="sec-desc">Real products deployed on the internet &mdash; crafted with code, creativity, and care.</p>
+  </div>
+  <div class="proj-grid rv2">
+
+    <a href="https://avamusic.vercel.app" target="_blank" rel="noopener" class="proj-card">
+      <div class="proj-screen" style="background:linear-gradient(135deg,#09091e,#160a30,#081e28)">
+        <iframe src="https://avamusic.vercel.app" title="Ava Music" loading="lazy" scrolling="no" tabindex="-1"></iframe>
+        <div class="proj-screen-bg">
+          <div class="proj-screen-emoji">&#x1F3B5;</div>
+          <div class="proj-screen-label">Music Website</div>
+        </div>
+        <div class="proj-hover-overlay"><div class="proj-hover-btn">View Live Site &nearr;</div></div>
+      </div>
+      <div class="proj-body">
+        <div class="proj-cat">Frontend &middot; Music</div>
+        <div class="proj-name">Ava Music</div>
+        <div class="proj-desc">A sleek, immersive music website with a stunning modern UI &mdash; built and deployed live on Vercel.</div>
+        <div class="proj-tags">
+          <span class="pt pt-p">Web Dev</span>
+          <span class="pt pt-c">Vercel</span>
+          <span class="pt pt-k">Music</span>
+        </div>
+        <div class="proj-link-row">Visit Live Site <span>&rarr;</span></div>
+      </div>
+    </a>
+
+    <a href="https://aiquizbymudit.vercel.app" target="_blank" rel="noopener" class="proj-card">
+      <div class="proj-screen" style="background:linear-gradient(135deg,#060f18,#0b1a0b,#120a28)">
+        <iframe src="https://aiquizbymudit.vercel.app" title="AI Quiz by Mudit" loading="lazy" scrolling="no" tabindex="-1"></iframe>
+        <div class="proj-screen-bg">
+          <div class="proj-screen-emoji">&#x1F916;</div>
+          <div class="proj-screen-label">AI Quiz Platform</div>
+        </div>
+        <div class="proj-hover-overlay"><div class="proj-hover-btn">View Live Site &nearr;</div></div>
+      </div>
+      <div class="proj-body">
+        <div class="proj-cat">Frontend &middot; AI &middot; Interactive</div>
+        <div class="proj-name">AI Quiz by Mudit</div>
+        <div class="proj-desc">An AI-powered quiz platform &mdash; interactive, intelligent, and deployed seamlessly on Vercel.</div>
+        <div class="proj-tags">
+          <span class="pt pt-c">AI Powered</span>
+          <span class="pt pt-p">Web Dev</span>
+          <span class="pt pt-c">Vercel</span>
+        </div>
+        <div class="proj-link-row">Visit Live Site <span>&rarr;</span></div>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- SERVICES -->
+<div class="svc-wrap" id="services">
+
+  <div class="svc-block rv">
+    <div class="svc-block-hd">
+      <div class="svc-icon si-a">&#x1F4BB;</div>
+      <div>
+        <div class="svc-block-title">Frontend Development</div>
+        <div class="svc-block-sub">Modern, responsive, blazing-fast websites built to convert visitors</div>
+      </div>
+    </div>
+    <div class="svc-grid" id="g-frontend"></div>
+    <div class="ai-badge"><span class="ai-badge-dot"></span> AI Chat Integration available on all website builds</div>
+  </div>
+
+  <div class="rule" style="margin:64px 0"></div>
+
+  <div class="svc-block rv" id="deployment">
+    <div class="svc-block-hd">
+      <div class="svc-icon si-b">&#x1F680;</div>
+      <div>
+        <div class="svc-block-title">Deployment Services</div>
+        <div class="svc-block-sub">Get your project live, reliable, and production-ready</div>
+      </div>
+    </div>
+    <div class="svc-grid" id="g-deploy"></div>
+  </div>
+
+  <div class="rule" style="margin:64px 0"></div>
+
+  <div class="svc-block rv" id="design">
+    <div class="svc-block-hd">
+      <div class="svc-icon si-c">&#x1F3A8;</div>
+      <div>
+        <div class="svc-block-title">Graphic Design &amp; Printing</div>
+        <div class="svc-block-sub">Visuals that stop the scroll and make your brand unforgettable</div>
+      </div>
+    </div>
+    <div class="svc-grid" id="g-design"></div>
+  </div>
+
+  <div class="rule" style="margin:64px 0"></div>
+
+  <div class="svc-block rv" id="social">
+    <div class="svc-block-hd">
+      <div class="svc-icon si-d">&#x1F4F1;</div>
+      <div>
+        <div class="svc-block-title">Social Media Branding</div>
+        <div class="svc-block-sub">Cohesive identity across every platform you live on</div>
+      </div>
+    </div>
+    <div class="svc-grid" id="g-social"></div>
+  </div>
+
+</div>
+
+<!-- WHY US -->
+<section class="sec sec-alt" id="why">
+  <div class="sec-head rv">
+    <div class="sec-eye">Why VibeCoded Tech</div>
+    <h2 class="sec-title">Built Different. <span class="hi">Delivered Right.</span></h2>
+    <p class="sec-desc">We blend engineering precision with creative boldness to ship digital products that actually work.</p>
+  </div>
+  <div class="why-grid" id="g-why"></div>
+</section>
+
+<!-- FOUNDER -->
+<section class="sec sec-alt" id="founder">
+  <div class="sec-head rv">
+    <div class="sec-eye">Meet the Founder</div>
+    <h2 class="sec-title">The Mind <span class="hi">Behind the Vibe</span></h2>
+  </div>
+  <div class="founder-wrap rv2">
+    <div class="founder-card">
+      <div class="founder-top">
+        <div class="founder-avatar">&#x1F468;&#x200D;&#x1F4BB;</div>
+        <div class="founder-name">Mudit Sharma</div>
+        <div class="founder-role">Founder &amp; Tech Enthusiast</div>
+        <p class="founder-bio">Passionate about transforming ideas into digital realities, Mudit founded VibeCoded Tech to deliver world-class web development, design, and branding &mdash; at startup pace, with enterprise quality.</p>
+      </div>
+      <div class="founder-bottom">
+        <span class="ftag">Web Development</span>
+        <span class="ftag">UI/UX Design</span>
+        <span class="ftag">AI Integration</span>
+        <span class="ftag">Brand Building</span>
+        <span class="ftag">Full-Stack</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="sec" id="contact">
+  <div class="sec-head rv">
+    <div class="sec-eye">Get In Touch</div>
+    <h2 class="sec-title">Let's Build <span class="hi">Something Epic</span></h2>
+    <p class="sec-desc">Ready to launch? Reach out &mdash; we respond fast and deliver faster.</p>
+  </div>
+
+  <div class="contact-grid rv">
+    <a href="tel:7668289736" class="cc">
+      <div class="cc-icon cc-i-phone">&#x1F4DE;</div>
+      <div class="cc-label">Call / WhatsApp</div>
+      <div class="cc-value">+91 76682 89736</div>
+      <div class="cc-sub">Tap to call or save the number</div>
+    </a>
+    <a href="mailto:vibecodedtech01@gmail.com" class="cc">
+      <div class="cc-icon cc-i-email">&#x2709;&#xFE0F;</div>
+      <div class="cc-label">Email</div>
+      <div class="cc-value">vibecodedtech01@gmail.com</div>
+      <div class="cc-sub">We reply within 24 hours</div>
+    </a>
+    <a href="https://www.instagram.com/VibeCodedtech" target="_blank" rel="noopener" class="cc cc-insta">
+      <div class="cc-insta-icon">&#x1F4F8;</div>
+      <div class="cc-insta-r">
+        <div class="cc-label">Instagram</div>
+        <div class="cc-value">@VibeCodedtech</div>
+        <div class="cc-sub">See our latest work, reels &amp; updates &mdash; DMs always open</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="cdb rv2">
+    <div class="cdb-bar"></div>
+    <div class="cdb-head">
+      <div class="cdb-head-ico">&#x1F4CB;</div>
+      <div class="cdb-head-t">
+        <h3>All Contact Details</h3>
+        <p>Every way to reach VibeCoded Tech &mdash; pick what works for you</p>
+      </div>
+    </div>
+    <div class="cdb-items">
+      <div class="cdbi">
+        <div class="cdbi-ico ci-ph">&#x1F4DE;</div>
+        <div>
+          <div class="cdbi-l">Phone / WhatsApp</div>
+          <div class="cdbi-v"><a href="tel:7668289736">+91 76682 89736</a></div>
+          <div class="cdbi-s">Calls &amp; WhatsApp messages</div>
+        </div>
+      </div>
+      <div class="cdbi">
+        <div class="cdbi-ico ci-em">&#x2709;&#xFE0F;</div>
+        <div>
+          <div class="cdbi-l">Email</div>
+          <div class="cdbi-v"><a href="mailto:vibecodedtech01@gmail.com">vibecodedtech01@gmail.com</a></div>
+          <div class="cdbi-s">24-hour response guarantee</div>
+        </div>
+      </div>
+      <div class="cdbi">
+        <div class="cdbi-ico ci-ig">&#x1F4F8;</div>
+        <div>
+          <div class="cdbi-l">Instagram</div>
+          <div class="cdbi-v"><a href="https://www.instagram.com/VibeCodedtech" target="_blank" rel="noopener">@VibeCodedtech</a></div>
+          <div class="cdbi-s">DMs open &mdash; latest work &amp; updates</div>
+        </div>
+      </div>
+      <div class="cdbi">
+        <div class="cdbi-ico ci-hr">&#x1F550;</div>
+        <div>
+          <div class="cdbi-l">Working Hours</div>
+          <div class="cdbi-v">Mon &ndash; Sat, 10 AM &ndash; 8 PM</div>
+          <div class="cdbi-s">IST &middot; Fast turnaround always</div>
+        </div>
+      </div>
+    </div>
+    <div class="cdb-acts">
+      <a href="https://wa.me/917668289736?text=Hi%20VibeCoded%20Tech!%20I%20want%20to%20discuss%20a%20project." target="_blank" rel="noopener" class="cdb-act act-p">&#x1F4AC; Chat on WhatsApp</a>
+      <a href="mailto:vibecodedtech01@gmail.com?subject=Project%20Inquiry%20%E2%80%93%20VibeCoded%20Tech" class="cdb-act act-s">&#x2709;&#xFE0F; Send Email</a>
+      <a href="https://www.instagram.com/VibeCodedtech" target="_blank" rel="noopener" class="cdb-act act-s">&#x1F4F8; DM Instagram</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="ft-logo">VibeCoded Tech</div>
+  <div class="ft-copy">&copy; 2025 VibeCoded Tech &middot; Crafted with &#x26A1; by Mudit Sharma</div>
+  <div class="ft-links">
+    <a href="#services">Services</a>
+    <a href="#projects">Projects</a>
+    <a href="#contact">Contact</a>
+    <a href="https://www.instagram.com/VibeCodedtech" target="_blank">Instagram</a>
+  </div>
+</footer>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal" onclick="closeModalBg(event)">
+  <div class="modal">
+    <div class="modal-accent"></div>
+    <button class="modal-close" onclick="closeModal()">&times;</button>
+    <div class="modal-top">
+      <div class="modal-em" id="m-em"></div>
+      <div class="modal-title" id="m-title"></div>
+      <div class="modal-desc" id="m-desc"></div>
+    </div>
+    <div class="modal-bot">
+      <button class="modal-cta" onclick="goContact()">Get a Free Quote &rarr;</button>
+      <a id="m-wa" href="#" target="_blank" rel="noopener" class="modal-wa">&#x1F4AC; Chat on WhatsApp</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = {
+  frontend:[
+    {e:'🌐',n:'Website Development',d:'Fully custom websites tailored to your brand, audience, and business goals.',v:'sb-a'},
+    {e:'🚀',n:'Landing Pages',d:'High-converting pages engineered to capture leads and drive action.',v:'sb-a'},
+    {e:'🏢',n:'Business Websites',d:'Professional sites that build credibility and drive real results.',v:'sb-a'},
+    {e:'💼',n:'Portfolio Websites',d:'Showcase your work with elegance and impact.',v:'sb-a'},
+    {e:'🌟',n:'Personal Brand Websites',d:'Establish your authority online with a powerful personal site.',v:'sb-a'},
+    {e:'🎵',n:'Artist & Musician Websites',d:'Music players, galleries, tour dates and booking integrations.',v:'sb-a'},
+    {e:'💡',n:'Startup Websites',d:'Launch-ready sites architected for growth and scale.',v:'sb-a'},
+    {e:'📦',n:'Product Showcase Websites',d:'Beautiful product displays that turn visitors into customers.',v:'sb-a'},
+    {e:'🎉',n:'Event Websites',d:'Event pages with RSVPs, countdowns, schedules and galleries.',v:'sb-a'},
+  ],
+  deploy:[
+    {e:'🐙',n:'GitHub Deployment',d:'Source control with automated CI/CD deployment pipelines.',v:'sb-b'},
+    {e:'▲',n:'Vercel Deployment',d:'Lightning-fast deploys with a global edge network.',v:'sb-b'},
+    {e:'🔺',n:'Netlify Deployment',d:'Continuous deployment with built-in forms and global CDN.',v:'sb-b'},
+    {e:'🌍',n:'Domain Connection',d:'Connect your custom domain and configure DNS easily.',v:'sb-b'},
+  ],
+  design:[
+    {e:'📋',n:'Business Posters',d:'Promote your brand with polished, striking poster designs.',v:'sb-c'},
+    {e:'🎯',n:'Promotional Posters',d:'Offers, campaigns, and launches — visuals that pop.',v:'sb-c'},
+    {e:'🪧',n:'Flex/Banner Design & Print',d:'Large-format flex banners, fully print-ready.',v:'sb-c'},
+    {e:'💳',n:'Visiting Card Design & Print',d:'Memorable cards that leave a lasting impression.',v:'sb-c'},
+    {e:'🖼️',n:'Business Photo Frames',d:'Custom branded frames for professional photography.',v:'sb-c'},
+    {e:'📸',n:'Event Photo Frames',d:'Branded frames for events, birthdays and celebrations.',v:'sb-c'},
+    {e:'📲',n:'Social Media Posts',d:'Scroll-stopping post designs built for every platform.',v:'sb-c'},
+    {e:'🎊',n:'Festival Creatives',d:'Festive visuals for every occasion and holiday.',v:'sb-c'},
+    {e:'📄',n:'Brochures & Flyers',d:'Print-ready marketing collateral that drives conversions.',v:'sb-c'},
+    {e:'💌',n:'Invitation Cards',d:'Elegant digital and print invitations for every event.',v:'sb-c'},
+    {e:'🍽️',n:'Menu Cards',d:'Restaurant and café menus — digital or print.',v:'sb-c'},
+    {e:'🏅',n:'Certificate Design',d:'Professional certificates for events, courses, and awards.',v:'sb-c'},
+    {e:'✏️',n:'Logo Design',d:"Iconic logos that embody your brand's identity.",v:'sb-c'},
+    {e:'📝',n:'Letterhead Design',d:'Formal branded letterheads for professional correspondence.',v:'sb-c'},
+  ],
+  social:[
+    {e:'📱',n:'Instagram Post Design',d:'Feed posts that build a beautiful, cohesive visual brand.',v:'sb-d'},
+    {e:'⏱️',n:'Story Design',d:'Eye-catching animated and static stories with real energy.',v:'sb-d'},
+    {e:'👥',n:'Facebook Banners',d:'Cover photos and page banners that command attention.',v:'sb-d'},
+    {e:'▶️',n:'YouTube Channel Art',d:'Channel banners, thumbnails, and full channel branding.',v:'sb-d'},
+    {e:'🖼️',n:'Profile & Cover Photos',d:'Consistent, branded profile visuals across all platforms.',v:'sb-d'},
+    {e:'🎨',n:'Social Media Branding Kits',d:'Full kit — posts, stories, covers, highlights and more.',v:'sb-d'},
+  ],
+};
+
+const WHY=[
+  {i:'🤖',t:'AI-Powered Websites',d:'Every website can include intelligent AI chat integration for a smarter user experience.'},
+  {i:'🔄',t:'End-to-End Service',d:'Design mockup to live deployment — we own every step so you never chase vendors.'},
+  {i:'⚡',t:'Fast Turnaround',d:'Startup pace means ideas become live products without the agonising wait.'},
+  {i:'💎',t:'Affordable Pricing',d:'Premium-quality execution at prices that respect every budget.'},
+  {i:'🎯',t:'Brand Consistency',d:'Web and print identity stays cohesive — one team, one vision, zero mixed signals.'},
+  {i:'🖨️',t:'Print-Ready Delivery',d:'All graphic work delivered print-ready at the highest professional resolution.'},
+];
+
+const TICKER_ITEMS=[
+  'Website Development','Landing Pages','Logo Design','GitHub Deployment',
+  'Vercel Deployment','Brochures & Flyers','Instagram Branding','Festival Creatives',
+  'AI Chat Integration','Business Websites','Visiting Cards','Letterhead Design',
+  'YouTube Channel Art','Domain Connection','Certificate Design','Social Media Kits',
+];
+
+const tt=document.getElementById('tickerTrack');
+[...TICKER_ITEMS,...TICKER_ITEMS].forEach(t=>{
+  const d=document.createElement('div');
+  d.className='ticker-item';
+  d.innerHTML='<span class="ticker-dot"></span>'+t;
+  tt.appendChild(d);
+});
+
+function buildGrid(id,items){
+  const g=document.getElementById(id);
+  items.forEach(s=>{
+    const b=document.createElement('button');
+    b.className='sb '+s.v;
+    b.innerHTML='<div class="sb-icon">'+s.e+'</div><span class="sb-name">'+s.n+'</span><span class="sb-desc">'+s.d+'</span><span class="sb-arr">&#x2197;</span>';
+    b.addEventListener('click',function(){openModal(s.e,s.n,s.d);});
+    g.appendChild(b);
+  });
+}
+buildGrid('g-frontend',DATA.frontend);
+buildGrid('g-deploy',DATA.deploy);
+buildGrid('g-design',DATA.design);
+buildGrid('g-social',DATA.social);
+
+const gw=document.getElementById('g-why');
+WHY.forEach(function(r){
+  const c=document.createElement('div');
+  c.className='why-card rv';
+  c.innerHTML='<div class="why-icon">'+r.i+'</div><h3>'+r.t+'</h3><p>'+r.d+'</p>';
+  gw.appendChild(c);
+});
+
+function openModal(em,title,desc){
+  document.getElementById('m-em').textContent=em;
+  document.getElementById('m-title').textContent=title;
+  document.getElementById('m-desc').textContent='Interested in "'+title+'"? We\'d love to bring your vision to life. Get in touch and we\'ll send a custom quote within 24 hours.';
+  document.getElementById('m-wa').href='https://wa.me/917668289736?text=Hi%20VibeCoded%20Tech!%20I%27m%20interested%20in%20'+encodeURIComponent(title)+'.';
+  document.getElementById('modal').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){document.getElementById('modal').classList.remove('open');document.body.style.overflow='';}
+function closeModalBg(e){if(e.target===document.getElementById('modal'))closeModal();}
+function goContact(){closeModal();smoothTo('contact');}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeModal();});
+
+const ro=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('on');ro.unobserve(e.target);}});
+},{threshold:0.06});
+document.querySelectorAll('.rv,.rv2').forEach(function(el){ro.observe(el);});
+
+window.addEventListener('scroll',function(){
+  document.getElementById('nav').classList.toggle('scrolled',window.scrollY>20);
+});
+
+function smoothTo(id){
+  const el=document.getElementById(id);
+  if(el)el.scrollIntoView({behavior:'smooth'});
+  const mn=document.getElementById('mobileNav');
+  if(mn.style.display==='block')mn.style.display='none';
+}
+function toggleNav(){
+  const mn=document.getElementById('mobileNav');
+  mn.style.display=mn.style.display==='block'?'none':'block';
+}
+</script>
+</body>
+</html>
